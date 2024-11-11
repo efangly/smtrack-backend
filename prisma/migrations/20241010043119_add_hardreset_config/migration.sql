@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Configs` ADD COLUMN `hardReset` VARCHAR(4) NULL DEFAULT '0200';

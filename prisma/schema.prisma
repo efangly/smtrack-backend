@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Devices {
+  devId           String                @id @db.VarChar(100)
+  wardId          String                @db.VarChar(100)
+  devSerial       String                @unique @db.VarChar(100)
+  devName         String                @unique @db.VarChar(500)
+  devDetail       String?               @db.VarChar(500)
+  devStatus       Boolean               @default(false)
+  devSeq          Int                   @unique @db.SmallInt
+  devZone         String?               @db.VarChar(155)
+  locInstall      String?               @db.VarChar(250)
+  locPic          String?               @db.VarChar(200)
+  dateInstall     DateTime?             @default(now())
+  firmwareVersion String?               @db.VarChar(55)
+  createBy        String?               @db.VarChar(100)
+  comment         String?               @db.VarChar(155)
+  backupStatus    String?               @default("0") @db.Char(1)
+  moveStatus      String?               @db.VarChar(100)
+  alarm           Boolean               @default(false)
+  duration        Int?                  @db.SmallInt
+  createAt        DateTime              @default(now())
+  updateAt        DateTime              @default(now()) @updatedAt
+  ward            Wards                 @relation(fields: [wardId], references: [wardId])
+  config          Configs?
+  noti            Notifications[]
+  notiBak         NotificationsBackup[]
+  log             LogDays[]
+  logBak          LogDaysBackup[]
+  repair          Repairs[]
+  warranty        Warranties[]
+  probe           Probes[]
+  history         ConfigHistory[]
+}
+
+model Probes {
+  probeId    String   @id @db.VarChar(100)
+  probeName  String   @db.VarChar(255)
+  probeType  String   @db.VarChar(20)
+  probeCh    String   @db.Char(1)
+  tempMin    Float    @default(0.00) @db.Float
+  tempMax    Float    @default(0.00) @db.Float
+  humMin     Float    @default(0.00) @db.Float
+  humMax     Float    @default(0.00) @db.Float
+  adjustTemp Float    @default(0.00) @db.Float
+  adjustHum  Float    @default(0.00) @db.Float
+  delayTime  String?  @db.VarChar(11)
+  door       Int?     @default(0) @db.SmallInt
+  location   String?  @db.VarChar(250)
+  devSerial  String   @db.VarChar(100)
+  createAt   DateTime @default(now())
+  updateAt   DateTime @default(now()) @updatedAt
+  device     Devices  @relation(fields: [devSerial], references: [devSerial])
+}
+
+model Configs {
+  confId       String   @id @default(uuid()) @db.VarChar(100)
+  mode         String?  @default("0") @db.Char(1)
+  modeEth      String?  @default("0") @db.Char(1)
+  ip           String?  @db.VarChar(50)
+  ipEth        String?  @db.VarChar(50)
+  macAddEth    String?  @db.VarChar(50)
+  macAddWiFi   String?  @db.VarChar(50)
+  subNet       String?  @db.VarChar(50)
+  subNetEth    String?  @db.VarChar(50)
+  getway       String?  @db.VarChar(50)
+  getwayEth    String?  @db.VarChar(50)
+  dns          String?  @db.VarChar(50)
+  dnsEth       String?  @db.VarChar(50)
+  ssid         String?  @db.VarChar(100)
+  ssidPass     String?  @db.VarChar(100)
+  sim          String?  @db.VarChar(100)
+  email1       String?  @db.VarChar(200)
+  email2       String?  @db.VarChar(200)
+  email3       String?  @db.VarChar(200)
+  notiTime     Int      @default(0) @db.SmallInt //ดีเลการส่งแจ้งเตือน 0 คือส่งทันที
+  backToNormal String   @default("0") @db.Char(1) //ส่งแจ้งเตือนหลังอุณหภูมิกลับมาปกติ
+  mobileNoti   String   @default("1") @db.Char(1) //เปิดปิดการแจ้งเตือนไปยังมือถือ
+  repeat       Int      @default(0) @db.SmallInt //ตั้งค่าการส่งซ้ำ ค่าเริ่มต้นคือ 1
+  firstDay     String?  @default("OFF") @db.VarChar(3)
+  secondDay    String?  @default("OFF") @db.VarChar(3)
+  thirdDay     String?  @default("OFF") @db.VarChar(3)
+  firstTime    String?  @default("0000") @db.VarChar(4)
+  secondTime   String?  @default("0000") @db.VarChar(4)
+  thirdTime    String?  @default("0000") @db.VarChar(4)
+  muteDoor     String   @default("0") @db.Char(1) //ปิดเสียงเตือนเมื่อเปิดปิดเซ็นเซอร์ประตู 0 คือเปิด 1 คือปิด
+  muteLong     String   @default("0") @db.Char(1) //ปิดเสียงเตือนเมื่อเปิดปิดalarm 0 คือเปิด 1 คือปิด
+  hardReset    String?  @default("0200") @db.VarChar(4) //ตั้งค่าเวลาที่ต้องการให้เครื่อง reset ตัวเอง
+  devSerial    String   @unique @db.VarChar(100)
+  createAt     DateTime @default(now())
+  updateAt     DateTime @default(now()) @updatedAt
+  device       Devices  @relation(fields: [devSerial], references: [devSerial])
+}
+
+model Hospitals {
+  hosId         String   @id @db.VarChar(100)
+  hosName       String   @db.VarChar(155)
+  hosAddress    String?  @db.VarChar(155)
+  hosTelephone  String?  @db.VarChar(100)
+  userContact   String?  @db.VarChar(155)
+  userTelePhone String?  @db.VarChar(100)
+  hosLatitude   String?  @db.VarChar(155)
+  hosLongitude  String?  @db.VarChar(155)
+  hosPic        String?  @db.VarChar(255)
+  createAt      DateTime @default(now())
+  updateAt      DateTime @default(now()) @updatedAt
+  ward          Wards[]
+}
+
+model Wards {
+  wardId   String    @id @db.VarChar(100)
+  wardName String    @db.VarChar(250)
+  wardSeq  Int       @unique @db.Int
+  hosId    String    @db.VarChar(100)
+  createAt DateTime  @default(now())
+  updateAt DateTime  @default(now()) @updatedAt
+  hospital Hospitals @relation(fields: [hosId], references: [hosId])
+  user     Users[]
+  device   Devices[]
+}
+
+model Users {
+  userId       String   @id @db.VarChar(100)
+  wardId       String   @db.VarChar(100)
+  userName     String   @unique @db.VarChar(155)
+  userPassword String   @db.VarChar(155)
+  userStatus   Boolean  @default(true)
+  userLevel    String   @default("4") @db.Char(1)
+  displayName  String?  @db.VarChar(150)
+  userPic      String?  @db.VarChar(255)
+  comment      String?  @db.VarChar(255)
+  createBy     String?  @db.VarChar(155)
+  createAt     DateTime @default(now())
+  updateAt     DateTime @default(now()) @updatedAt
+  ward         Wards    @relation(fields: [wardId], references: [wardId])
+  role         Roles    @relation(fields: [userLevel], references: [roleId])
+}
+
+model Roles {
+  roleId       String   @id @db.Char(1)
+  roleName     String   @db.VarChar(500)
+  rolePriority String   @default("4") @db.Char(1)
+  createAt     DateTime @default(now())
+  updateAt     DateTime @default(now()) @updatedAt
+  user         Users[]
+}
+
+model Notifications {
+  notiId     String   @id @db.VarChar(100)
+  devSerial  String   @db.VarChar(100)
+  notiDetail String   @db.VarChar(255)
+  notiStatus Boolean  @default(false)
+  createAt   DateTime @default(now())
+  updateAt   DateTime @default(now()) @updatedAt
+  device     Devices  @relation(fields: [devSerial], references: [devSerial])
+}
+
+model Repairs {
+  repairId       String   @id @db.VarChar(100)
+  repairNo       Int      @unique @default(autoincrement()) @db.SmallInt
+  devId          String   @db.VarChar(100)
+  repairInfo     String?  @db.VarChar(155)
+  repairInfo1    String?  @db.VarChar(155)
+  repairInfo2    String?  @db.VarChar(155)
+  repairLocation String?  @db.VarChar(155)
+  ward           String?  @db.VarChar(155)
+  repairDetails  String?  @db.VarChar(155)
+  telePhone      String?  @db.VarChar(11)
+  repairStatus   String?  @db.VarChar(155)
+  warrantyStatus String?  @db.Char(1)
+  comment        String?  @db.VarChar(155)
+  baseStatus     String?  @default("0") @db.Char(1)
+  createAt       DateTime @default(now())
+  updateAt       DateTime @default(now()) @updatedAt
+  device         Devices  @relation(fields: [devId], references: [devId])
+}
+
+model Warranties {
+  warrId          String   @id @db.VarChar(100)
+  devName         String   @db.VarChar(100)
+  productName     String?  @db.VarChar(255)
+  productModel    String?  @db.VarChar(255)
+  installDate     String?  @db.VarChar(255)
+  customerName    String?  @db.VarChar(255)
+  customerAddress String?  @db.VarChar(500)
+  saleDept        String?  @db.VarChar(100)
+  invoice         String?  @db.VarChar(50)
+  expire          DateTime @default(now())
+  warrStatus      Boolean  @default(false)
+  createAt        DateTime @default(now())
+  updateAt        DateTime @default(now()) @updatedAt
+  device          Devices  @relation(fields: [devName], references: [devName])
+}
+
+model LogDays {
+  logId         String   @id @db.VarChar(100)
+  devSerial     String   @db.VarChar(100)
+  tempValue     Float    @default(0.00) @db.Float
+  tempAvg       Float    @default(0.00) @db.Float
+  humidityValue Float    @default(0.00) @db.Float
+  humidityAvg   Float    @default(0.00) @db.Float
+  sendTime      DateTime @default(now())
+  ac            String   @default("0") @db.Char(1)
+  door1         String   @default("0") @db.Char(1)
+  door2         String   @default("0") @db.Char(1)
+  door3         String   @default("0") @db.Char(1)
+  internet      String   @default("0") @db.Char(1)
+  probe         String   @default("1") @db.VarChar(10)
+  battery       Int      @default(0) @db.SmallInt
+  ambient       Float?   @default(0.00) @db.Float
+  sdCard        String   @default("0") @db.Char(1)
+  createAt      DateTime @default(now())
+  updateAt      DateTime @default(now()) @updatedAt
+  device        Devices  @relation(fields: [devSerial], references: [devSerial])
+}
+
+model LogDaysBackup {
+  logId         String   @id @db.VarChar(100)
+  devSerial     String   @db.VarChar(100)
+  tempValue     Float    @default(0.00) @db.Float
+  tempAvg       Float    @default(0.00) @db.Float
+  humidityValue Float    @default(0.00) @db.Float
+  humidityAvg   Float    @default(0.00) @db.Float
+  sendTime      DateTime @default(now())
+  ac            String   @default("0") @db.Char(1)
+  door1         String   @default("0") @db.Char(1)
+  door2         String   @default("0") @db.Char(1)
+  door3         String   @default("0") @db.Char(1)
+  internet      String   @default("0") @db.Char(1)
+  probe         String   @default("1") @db.VarChar(10)
+  battery       Int      @default(0) @db.SmallInt
+  ambient       Float?   @default(0.00) @db.Float
+  sdCard        String   @default("0") @db.Char(1)
+  createAt      DateTime @default(now())
+  updateAt      DateTime @default(now()) @updatedAt
+  device        Devices  @relation(fields: [devSerial], references: [devSerial])
+}
+
+model NotificationsBackup {
+  notiId     String   @id @db.VarChar(100)
+  devSerial  String   @db.VarChar(100)
+  notiDetail String   @db.VarChar(255)
+  notiStatus Boolean  @default(false)
+  createAt   DateTime @default(now())
+  updateAt   DateTime @default(now()) @updatedAt
+  device     Devices  @relation(fields: [devSerial], references: [devSerial])
+}
+
+model ConfigHistory {
+  id        String   @id @db.VarChar(100)
+  devSerial String   @db.VarChar(100)
+  detail    String   @db.VarChar(500)
+  userId    String   @db.VarChar(155)
+  createAt  DateTime @default(now())
+  updateAt  DateTime @default(now()) @updatedAt
+  device    Devices  @relation(fields: [devSerial], references: [devSerial])
+}

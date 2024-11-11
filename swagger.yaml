@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: E-TEMP API
+  description: testing api page.
+  version: 0.1.9
+servers:
+  - url: https://api.siamatic.co.th/etemp
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Device
+  - name: Hospital
+  - name: User
+  - name: Ward
+  - name: Log
+  - name: Notification
+  - name: Probe
+  - name: Repair
+  - name: Warranty
+paths:
+  /auth/login:
+    post:
+      tags: 
+        - Auth
+      summary: Returns a login users.
+      requestBody:
+        description: Require username & password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: 
+                type: array
+  /user:
+    get:
+      tags:
+        - User
+      summary: Returns a list of users.
+      responses:
+        '200':    # status code
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: string
+  /device:
+    get:
+      tags:
+        - Device
+      summary: Get a list of devices
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Device'
+    post:
+      tags:
+        - Device
+      summary: Create a new device
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileupload:
+                  type: string
+                  format: binary
+                body:
+                  $ref: '#/components/schemas/Device'
+      responses:
+        '201':
+          description: Device created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Device'
+  /device/{devId}:
+    get:
+      tags:
+        - Device
+      summary: Get a device by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: devId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Device'
+    put:
+      tags:
+        - Device
+      summary: Update a device by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: devId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileupload:
+                  type: string
+                  format: binary
+                body:
+                  $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Device'
+    delete:
+      tags:
+        - Device
+      summary: Delete a device by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: devId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Device'
+  /device/{devId}/{afterDevId}:
+    patch:
+      tags:
+        - Device
+      summary: Change device sequence
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: devId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: afterDevId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                devSeq:
+                  type: integer
+                afterDevSeq:
+                  type: integer
+      responses:
+        '200':
+          description: Device sequence changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                  data:
+                    type: boolean
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  # optional, for documentation purposes only
+  schemas:
+    Device:
+      type: object
+      properties:
+        devId:
+          type: string
+        devName:
+          type: string
+        devSerial:
+          type: string
+        devStatus:
+          type: string
+        devType:
+          type: string
+        devModel:
+          type: string
+        devManufacturer:
+          type: string
+        devFirmware:
+          type: string
+        devHardware:
+          type: string
+        devLocation:
+          type: string
+        devDescription:
+          type: string
+        devImage:
+          type: string
+        devCreatedAt:
+          type: string
+          format: date-time
+        devUpdatedAt:
+          type: string
+          format: date-time                    
