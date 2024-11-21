@@ -45,15 +45,7 @@ const notificationList = async (token: ResToken): Promise<Notifications[]> => {
             devSerial: true,
             devDetail: true
           },
-          include: {
-            ward: {
-              select: {
-                wardId: true,
-                wardName: true,
-                hosId: true
-              }
-            }
-          }
+          include: { ward: true }
         }
       },
       orderBy: [
