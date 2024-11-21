@@ -43,9 +43,9 @@ const notificationList = async (token: ResToken): Promise<Notifications[]> => {
             devId: true,
             devName: true,
             devSerial: true,
-            devDetail: true
-          },
-          include: { ward: true }
+            devDetail: true,
+            ward: true
+          }
         }
       },
       orderBy: [
