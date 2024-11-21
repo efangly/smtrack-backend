@@ -43,7 +43,8 @@ const deviceWithLog = async (token?: ResToken): Promise<Devices[]> => {
             warranty: { where: { warrStatus: false } },
             repair: true,
             history: { where: { createAt: { gte: getDistanceTime('day') } } },
-            log: { where: { internet: "1" } }
+            log: { where: { internet: "1" } },
+            noti: { where: { notiDetail: "INTERNET/ON" } }
           }
         }
       },
