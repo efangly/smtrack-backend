@@ -12,6 +12,8 @@ RUN npm run build
 
 RUN rm -fR ./src tsconfig.json
 
+RUN apk add --no-cache openssl
+
 RUN mkdir /usr/src/app/public
 
 VOLUME /usr/src/app/public
