@@ -214,11 +214,8 @@ const addLog = async (body: LogDays | LogDays[]) => {
       if (sendTimeYear === undefined) throw new ValidationError(`${body.devSerial}: Sendtime is invalid, ${body.sendTime}`);
       if (body.tempValue !== 0 && body.humidityValue !== 0 && sendTimeYear === currentYear) {
         body.logId = `LOG-${uuidv4()}`;
-        body.sendTime = getDateFormat(body.sendTime);
         body.createAt = getDateFormat(new Date());
         body.updateAt = getDateFormat(new Date());
-        removeCache("log");
-        removeCache("device");
         sendNewQueue({
           serial: body.devSerial,
           temp: body.tempValue,
@@ -236,6 +233,9 @@ const addLog = async (body: LogDays | LogDays[]) => {
           tempInternal: body.ambient || 0,
           extMemory: body.sdCard === "1" ? true : false
         });
+        body.sendTime = getDateFormat(body.sendTime);
+        removeCache("log");
+        removeCache("device");
         return await prisma.logDays.create({ data: body });
       } else {
         if (sendTimeYear === currentYear) {
