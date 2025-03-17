@@ -25,7 +25,7 @@ const hospitalList = async (token: ResToken): Promise<Hospitals[]> => {
         keyName = "hospital";
     }
     // get cache
-    const cache =  await checkCachedData(keyName);
+    const cache = await checkCachedData(keyName);
     if (cache) return JSON.parse(cache) as unknown as Hospitals[];
     const result = await prisma.hospitals.findMany({ 
       where: conditions,

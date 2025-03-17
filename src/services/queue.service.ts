@@ -1,14 +1,17 @@
 import { Channel, connect } from "amqplib";
 import dotenv from "dotenv";
+import { TNewLog, TNewNotification } from "../models";
 dotenv.config();
 
 let channel: Channel;
+let newChannel: Channel;
 
 const initQueue = async () => {
   const exchangeName = "smtrack";
   const conn = await connect(String(process.env.RABBITMQ)); 
   channel = await conn.createChannel();
   await channel.assertExchange(exchangeName, 'direct', { durable: true });
+  newChannel = await conn.createChannel();
 }
 
 const sendToQueue = async (queueName: string, payload: string): Promise<void> => {
@@ -20,4 +23,22 @@ const sendToQueue = async (queueName: string, payload: string): Promise<void> =>
   }
 }
 
-export { initQueue, sendToQueue }
+const sendNewQueue = async (payload: TNewLog) => {
+  try {
+    await newChannel.assertQueue('log_queue', { durable: true }); 
+    newChannel.sendToQueue('log_queue', Buffer.from(`{"pattern":"logday","data": ${JSON.stringify(payload)}}`), { persistent: true });
+  } catch (err) {
+    throw err;
+  }
+}
+
+const sendNewNotification = async (payload: TNewNotification) => {
+  try {
+    await newChannel.assertQueue('notification_queue', { durable: true }); 
+    newChannel.sendToQueue('notification_queue', Buffer.from(`{"pattern":"notification","data": ${JSON.stringify(payload)}}`), { persistent: true });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export { initQueue, sendToQueue, sendNewQueue, sendNewNotification }
