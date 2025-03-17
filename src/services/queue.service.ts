@@ -5,6 +5,7 @@ dotenv.config();
 
 let channel: Channel;
 let newChannel: Channel;
+let deviceChannel: Channel;
 
 const initQueue = async () => {
   const exchangeName = "smtrack";
@@ -12,6 +13,7 @@ const initQueue = async () => {
   channel = await conn.createChannel();
   await channel.assertExchange(exchangeName, 'direct', { durable: true });
   newChannel = await conn.createChannel();
+  deviceChannel = await conn.createChannel();
 }
 
 const sendToQueue = async (queueName: string, payload: string): Promise<void> => {
@@ -27,6 +29,8 @@ const sendNewQueue = async (payload: TNewLog) => {
   try {
     await newChannel.assertQueue('log_queue', { durable: true }); 
     newChannel.sendToQueue('log_queue', Buffer.from(`{"pattern":"logday","data": ${JSON.stringify(payload)}}`), { persistent: true });
+    await deviceChannel.assertQueue('log_device_queue', { durable: true });
+    deviceChannel.sendToQueue('log_device_queue', Buffer.from(`{"pattern":"log-device","data": ${JSON.stringify(payload)}}`), { persistent: true });
   } catch (err) {
     throw err;
   }
