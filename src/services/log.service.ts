@@ -192,15 +192,15 @@ const addLog = async (body: LogDays | LogDays[]) => {
               humidity: log.humidityValue,
               humidityDisplay: log.humidityAvg,
               sendTime: log.sendTime,
-              plug: log.ac === "1" ? true : false,
-              door1: log.door1 === "1" ? true : false,
-              door2: log.door2 === "1" ? true : false,
-              door3: log.door3 === "1" ? true : false,
-              internet: log.internet === "1" ? true : false,
+              plug: log.ac === "0" ? true : false,
+              door1: log.door1 === "0" ? true : false,
+              door2: log.door2 === "0" ? true : false,
+              door3: log.door3 === "0" ? true : false,
+              internet: log.internet === "0" ? true : false,
               probe: log.probe,
               battery: log.battery,
               tempInternal: log.ambient || 0,
-              extMemory: log.sdCard === "1" ? true : false
+              extMemory: log.sdCard === "0" ? true : false
             });
           }
         }
@@ -223,15 +223,15 @@ const addLog = async (body: LogDays | LogDays[]) => {
           humidity: body.humidityValue,
           humidityDisplay: body.humidityAvg,
           sendTime: body.sendTime,
-          plug: body.ac === "1" ? true : false,
-          door1: body.door1 === "1" ? true : false,
-          door2: body.door2 === "1" ? true : false,
-          door3: body.door3 === "1" ? true : false,
-          internet: body.internet === "1" ? true : false,
+          plug: body.ac === "0" ? true : false,
+          door1: body.door1 === "0" ? true : false,
+          door2: body.door2 === "0" ? true : false,
+          door3: body.door3 === "0" ? true : false,
+          internet: body.internet === "0" ? true : false,
           probe: body.probe,
           battery: body.battery,
           tempInternal: body.ambient || 0,
-          extMemory: body.sdCard === "1" ? true : false
+          extMemory: body.sdCard === "0" ? true : false
         });
         body.sendTime = getDateFormat(body.sendTime);
         removeCache("log");
