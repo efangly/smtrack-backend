@@ -128,14 +128,14 @@ const addNotification = async (body: Notifications): Promise<Notifications> => {
       include: { device: { include: { ward: { include: { hospital: true } } } } }
     });
     const pushMessage = setDetailMessage(body.notiDetail);
-    // if (result.device.ward.hosId === "HID-DEVELOPMENT") {
-    //   sendToQueue("notification", JSON.stringify({topic: 'admin', title: result.device.devDetail, detail: pushMessage}));
-    // } else {
-    //   sendToQueue("notification", JSON.stringify({topic: 'admin', title: result.device.devDetail, detail: pushMessage}));
-    //   sendToQueue("notification", JSON.stringify({topic: 'service', title: result.device.devDetail, detail: pushMessage}));
-    //   sendToQueue("notification", JSON.stringify({topic: result.device.wardId, title: result.device.devDetail, detail: pushMessage}));
-    //   sendToQueue("notification", JSON.stringify({topic: result.device.ward.hosId, title: result.device.devDetail, detail: pushMessage}));
-    // }
+    if (result.device.ward.hosId === "HID-DEVELOPMENT") {
+      sendToQueue("notification", JSON.stringify({topic: 'admin', title: result.device.devDetail, detail: pushMessage}));
+    } else {
+      sendToQueue("notification", JSON.stringify({topic: 'admin', title: result.device.devDetail, detail: pushMessage}));
+      sendToQueue("notification", JSON.stringify({topic: 'service', title: result.device.devDetail, detail: pushMessage}));
+      sendToQueue("notification", JSON.stringify({topic: result.device.wardId, title: result.device.devDetail, detail: pushMessage}));
+      sendToQueue("notification", JSON.stringify({topic: result.device.ward.hosId, title: result.device.devDetail, detail: pushMessage}));
+    }
     sendNewNotification({
       serial: result.devSerial,
       message: body.notiDetail,
