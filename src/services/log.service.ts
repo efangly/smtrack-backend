@@ -251,6 +251,7 @@ const addLog = async (body: LogDays | LogDays[]) => {
     }
   } catch (error) {
     console.log(error);
+    return error;
   }
 };
 
