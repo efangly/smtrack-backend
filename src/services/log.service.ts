@@ -300,7 +300,8 @@ const backupLog = async (): Promise<string> => {
     await redisConn.flushAll();
     return `${responseMessage} && ${await backupNoti()}`;
   } catch (error) {
-    throw error;
+    console.log(error);
+    return 'error';
   }
 }
 
