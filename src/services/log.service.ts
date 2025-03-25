@@ -250,7 +250,7 @@ const addLog = async (body: LogDays | LogDays[]) => {
       }
     }
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 };
 
