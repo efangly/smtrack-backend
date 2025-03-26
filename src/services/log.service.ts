@@ -287,9 +287,10 @@ const backupLog = async (): Promise<string> => {
       orderBy: { createAt: 'asc' }
     });
     if (backupList.length > 0) {
-      await prisma.logDaysBackup.createMany({
-        data: backupList
-      });
+      // await prisma.logDaysBackup.createMany({
+      //   data: backupList
+      // });
+      await insertBackup(backupList);
       await prisma.logDays.deleteMany({
         where: { sendTime: { lt: getDistanceTime('day') } }
       });
@@ -303,6 +304,18 @@ const backupLog = async (): Promise<string> => {
     console.log(error);
     return 'error';
   }
+}
+
+const insertBackup = async (body: LogDays[]) => {
+  for (const log of body) {
+    try {
+      await prisma.logDaysBackup.create({ data: log });
+    } catch (error) {
+      console.log(log.devSerial);
+      console.log(error);
+    }
+  }
+  return "Insert backup log success";
 }
 
 export {
