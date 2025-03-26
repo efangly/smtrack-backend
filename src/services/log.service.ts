@@ -207,7 +207,7 @@ const addLog = async (body: LogDays | LogDays[]) => {
       });
       removeCache("log");
       removeCache("device");
-      backupLog();
+      // backupLog();
       return logArr.length > 0 ? await prisma.logDays.createMany({ data: logArr }) : [];
     } else {
       const sendTimeYear = getDateFullYear(body.sendTime); 
