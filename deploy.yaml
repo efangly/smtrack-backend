@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: etemp-legacy
+  namespace: smtrack
+spec:
+  serviceName: etemp-legacy
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etemp-legacy
+  template:
+    metadata:
+      labels:
+        app: etemp-legacy
+    spec:
+      containers:
+      - name: etemp-legacy
+        image: siamatic/smtrack-backend:1.0.0
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 1
+          limits:
+            memory: 512Mi
+            cpu: 1
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - name: etemp-data
+          mountPath: /usr/src/app/public
+        env:
+        - name: PORT
+          value: '8080'
+        - name: JWT_SECRET
+          value: test-login@12345
+        - name: DATABASE_URL
+          value: mysql://thanes1:@Thanes1234@siamatic.co.th:23300/etemp
+        - name: DATABASE_URL_REPLICATE
+          value: mysql://thanes1:@Thanes1234@siamatic.co.th:23300/etemp
+        - name: SOCKET_URL
+          value: http://socket-legacy:3000
+        - name: TZ
+          value: Asia/Bangkok
+        - name: REDIS_URL
+          value: redis://demo.siamatic.dev:26379
+        - name: REDIS_PASSWORD
+          value: thanesmail1234
+        - name: EXPIRE_TIME
+          value: 15d
+        - name: SLACK_WEBHOOK
+          value: https://hooks.slack.com/services/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
+        - name: RABBITMQ
+          value: amqp://admin:thanesmail1234@rabbitmq-cluster.rabbitmq.svc.cluster.local:5672
+        - name: NODE_ENV
+          value: production
+  volumeClaimTemplates:
+  - metadata:
+      name: etemp-data
+      namespace: smtrack
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: legacy-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etemp-legacy
+  namespace: smtrack
+spec:
+  selector:
+    app: etemp-legacy
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
