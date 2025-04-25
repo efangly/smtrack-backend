@@ -215,7 +215,8 @@ const deviceEvent = async (clientid: string, event: string): Promise<string> => 
     }
     return "OK";
   } catch (error) {
-    throw error;
+    console.log(error);
+    return "ERROR";
   }
 }
 
