@@ -6,6 +6,7 @@ import { Users } from "@prisma/client";
 import { getDateFormat, removeCache } from "../utils";
 import { ResLogin, ResToken, TLogin, TRegisUser, TResetPass } from "../models";
 import { HttpError } from "../error";
+import { sendToAuthQueue } from "./queue.service";
 
 const regisUser = async (params: TRegisUser, pic?: Express.Multer.File): Promise<Users> => {
   try {
@@ -31,6 +32,7 @@ const regisUser = async (params: TRegisUser, pic?: Express.Multer.File): Promise
     await removeCache("user");
     await removeCache("ward");
     await removeCache("hospital");
+    sendToAuthQueue({ id: result.userId, wardId: result.ward.wardId, hosId: result.ward.hospital.hosId }, "add-user");
     return result as unknown as Users;
   } catch (error) {
     throw error;

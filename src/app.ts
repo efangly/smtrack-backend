@@ -6,6 +6,7 @@ import { prisma, socket, initRedis } from "./configs";
 import routes from "./routes";
 import { globalErrorHanlder } from "./middlewares";
 import { initQueue } from "./services";
+import { connectRabbitMQ } from "./services/consumer.service";
 
 const app: Application = express();
 
@@ -36,6 +37,7 @@ app.use(globalErrorHanlder);
 app.listen(port, () => {
   initRedis();
   initQueue();
+  connectRabbitMQ().catch(console.error);
   socket.on('connect', () => console.log("Socket connected"));
   socket.on('disconnect', () => console.log("Socket disconnected"));
   console.log(`Start server in port ${port}`);

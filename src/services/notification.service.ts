@@ -136,11 +136,13 @@ const addNotification = async (body: Notifications): Promise<Notifications> => {
       sendToQueue("notification", JSON.stringify({topic: result.device.wardId, title: result.device.devDetail, detail: pushMessage}));
       sendToQueue("notification", JSON.stringify({topic: result.device.ward.hosId, title: result.device.devDetail, detail: pushMessage}));
     }
-    sendNewNotification({
-      serial: result.devSerial,
-      message: body.notiDetail,
-      detail: pushMessage
-    });
+    if (!body.notiDetail.startsWith("REPORT")) {
+      sendNewNotification({
+        serial: result.devSerial,
+        message: body.notiDetail,
+        detail: pushMessage
+      });
+    }
     socket.emit("send_message", {
       device: result.device.devDetail,
       message: pushMessage,

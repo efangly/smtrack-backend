@@ -6,6 +6,7 @@ dotenv.config();
 let channel: Channel;
 let newChannel: Channel;
 let deviceChannel: Channel;
+let authChannel: Channel;
 
 const initQueue = async () => {
   const exchangeName = "smtrack";
@@ -14,6 +15,7 @@ const initQueue = async () => {
   await channel.assertExchange(exchangeName, 'direct', { durable: true });
   newChannel = await conn.createChannel();
   deviceChannel = await conn.createChannel();
+  authChannel = await conn.createChannel();
 }
 
 const sendToQueue = async (queueName: string, payload: string): Promise<void> => {
@@ -45,4 +47,22 @@ const sendNewNotification = async (payload: TNewNotification) => {
   }
 }
 
-export { initQueue, sendToQueue, sendNewQueue, sendNewNotification }
+const sendToDeviceQueue = async <T>(pattern: string, payload: T) => {
+  try {
+    await deviceChannel.assertQueue('log_device_queue', { durable: true }); 
+    deviceChannel.sendToQueue('log_device_queue', Buffer.from(`{"pattern":"${pattern}","data": ${JSON.stringify(payload)}}`), { persistent: true });
+  } catch (err) {
+    throw err;
+  }
+}
+
+const sendToAuthQueue = async <T>(payload: T, pattern: string) => {
+  try {
+    await authChannel.assertQueue('auth_queue', { durable: true }); 
+    authChannel.sendToQueue('auth_queue', Buffer.from(`{"pattern":"${pattern}","data": ${JSON.stringify(payload)}}`), { persistent: true });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export { initQueue, sendToQueue, sendNewQueue, sendNewNotification, sendToDeviceQueue, sendToAuthQueue };

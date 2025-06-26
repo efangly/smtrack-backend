@@ -5,9 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { getDeviceImage, getDateFormat, getDistanceTime, objToString, checkCachedData, setCacheData, removeCache, splitLog } from "../utils";
 import { Configs, Devices, LogDays, Prisma } from "@prisma/client";
 import { NotFoundError } from "../error";
-import { ResToken, TAdjustConfig, TDevice, TQueryDevice } from "../models";
+import { ResToken, TAdjustConfig, TDevice, TNewConfig, TNewProbe, TQueryDevice } from "../models";
 import { addHistory } from "./history.service";
 import { format } from "date-fns";
+import { sendToDeviceQueue } from "./queue.service";
 
 const deviceList = async (): Promise<Devices[]> => {
   try {
@@ -283,6 +284,52 @@ const editDeviceConfig = async (deviceId: string, body: TAdjustConfig): Promise<
           } : undefined
         }
       },
+    });
+    sendToDeviceQueue<{id: String, config:TNewConfig}>('update-config', {
+      id: result.devSerial,
+      config: {
+        dhcp: result.config?.mode === "1" ? true : false,
+        ip: result.config?.ip ?? undefined,
+        mac: result.config?.macAddWiFi ?? undefined,
+        subnet: result.config?.subNet ?? undefined,
+        gateway: result.config?.getway ?? undefined,
+        dns: result.config?.dns ?? undefined,
+        dhcpEth: result.config?.modeEth === "1" ? true : false,
+        ipEth: result.config?.ipEth ?? undefined,
+        macEth: result.config?.macAddEth ?? undefined,
+        subnetEth: result.config?.subNetEth ?? undefined,
+        gatewayEth: result.config?.getwayEth ?? undefined,
+        dnsEth: result.config?.dnsEth ?? undefined,
+        ssid: result.config?.ssid ?? "RDE3_2.4GHz",
+        password: result.config?.ssidPass ?? "rde05012566",
+        simSP: result.config?.sim ?? undefined,
+        email1: result.config?.email1 ?? undefined,
+        email2: result.config?.email2 ?? undefined,
+        email3: result.config?.email3 ?? undefined,
+        hardReset: result.config?.hardReset ?? "0200",
+      }
+    });
+    sendToDeviceQueue<{id: String, probe: TNewProbe}>('update-probe', {
+      id: result.devSerial,
+      probe: {
+        name: result.probe[0].probeName,
+        type: result.probe[0].probeType,
+        channel: result.probe[0].probeCh,
+        tempMin: result.probe[0].tempMin,
+        tempMax: result.probe[0].tempMax,
+        humiMin: result.probe[0].humMin,
+        humiMax: result.probe[0].humMax,
+        tempAdj: result.probe[0].adjustTemp,
+        humiAdj: result.probe[0].adjustHum,
+        firstDay: result.config?.firstDay ?? "OFF",
+        secondDay: result.config?.secondDay ?? "OFF",
+        thirdDay: result.config?.thirdDay ?? "OFF",
+        firstTime: result.config?.firstTime ?? "OFF",
+        secondTime: result.config?.secondTime ?? "OFF",
+        thirdTime: result.config?.thirdTime ?? "OFF",
+        doorQty: result.probe[0].door ?? 1,
+        position: result.probe[0].location,
+      }
     });
     removeCache("hospital");
     removeCache("ward");
