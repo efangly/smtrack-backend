@@ -23,8 +23,6 @@ const connectRabbitMQ = async () => {
     if (msg !== null) {
       try {
         const content = JSON.parse(msg.content.toString()) as MessageContent;
-        console.log('Received topic:', content.pattern);
-        console.log('Received message:', content);
         switch (content.pattern) {
           case 'probe':
             const probeData = content.data.data as TNewProbe;
