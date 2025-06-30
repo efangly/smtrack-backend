@@ -13,6 +13,9 @@ const regisUser = async (params: TRegisUser, pic?: Express.Multer.File): Promise
     const result = await prisma.users.create({
       select: {
         userId: true,
+        userName: true,
+        userPassword: true,
+        displayName: true,
         userLevel: true,
         ward: { include: { hospital: true } }
       },
@@ -32,7 +35,13 @@ const regisUser = async (params: TRegisUser, pic?: Express.Multer.File): Promise
     await removeCache("user");
     await removeCache("ward");
     await removeCache("hospital");
-    sendToAuthQueue({ id: result.userId, wardId: result.ward.wardId, hosId: result.ward.hospital.hosId }, "add-user");
+    sendToAuthQueue({ 
+      id: result.userId, 
+      username: result.userName, 
+      display: result.displayName, 
+      wardId: result.ward.wardId, 
+      hosId: result.ward.hospital.hosId 
+    }, "add-user");
     return result as unknown as Users;
   } catch (error) {
     throw error;
