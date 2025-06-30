@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getDeviceImage, getDateFormat, getDistanceTime, objToString, checkCachedData, setCacheData, removeCache, splitLog } from "../utils";
 import { Configs, Devices, LogDays, Prisma } from "@prisma/client";
 import { NotFoundError } from "../error";
-import { ResToken, TAdjustConfig, TDevice, TNewConfig, TNewProbe, TQueryDevice } from "../models";
+import { ResToken, TAdjustConfig, TDevice, TNewConfig, TNewDevice, TNewProbe, TQueryDevice } from "../models";
 import { addHistory } from "./history.service";
 import { format } from "date-fns";
 import { sendToDeviceQueue } from "./queue.service";
@@ -167,6 +167,10 @@ const updateFirmware = async (devSerial: string, body: Devices) => {
       data: body
     });
     removeCache("device");
+    sendToDeviceQueue<{ id: string, device: TNewDevice }>('update-device', {
+      id: result.devSerial,
+      device: { firmware: result.firmwareVersion ?? "1.0.0" }
+    });
     return result;
   } catch (error) {
     throw error;
@@ -245,9 +249,58 @@ const editConfig = async (deviceId: string, body: Configs, token: ResToken): Pro
     body.updateAt = getDateFormat(new Date());
     const result = await prisma.configs.update({
       where: { devSerial: deviceId },
-      data: body
+      data: body,
+      include: {
+        device: { include: { probe: true } }
+      }
     });
     await addHistory(`Config: [${detail}]`, result.devSerial, token.userId);
+    sendToDeviceQueue<{id: String, config:TNewConfig}>('update-config', {
+      id: result.devSerial,
+      config: {
+        dhcp: result.mode === "1" ? true : false,
+        ip: result.ip ?? undefined,
+        mac: result.macAddWiFi ?? undefined,
+        subnet: result.subNet ?? undefined,
+        gateway: result.getway ?? undefined,
+        dns: result.dns ?? undefined,
+        dhcpEth: result.modeEth === "1" ? true : false,
+        ipEth: result.ipEth ?? undefined,
+        macEth: result.macAddEth ?? undefined,
+        subnetEth: result.subNetEth ?? undefined,
+        gatewayEth: result.getwayEth ?? undefined,
+        dnsEth: result.dnsEth ?? undefined,
+        ssid: result.ssid ?? "RDE3_2.4GHz",
+        password: result.ssidPass ?? "rde05012566",
+        simSP: result.sim ?? undefined,
+        email1: result.email1 ?? undefined,
+        email2: result.email2 ?? undefined,
+        email3: result.email3 ?? undefined,
+        hardReset: result.hardReset ?? "0200",
+      }
+    });
+    sendToDeviceQueue<{id: String, probe: TNewProbe}>('update-probe', {
+      id: result.devSerial,
+      probe: {
+        name: result.device.probe[0].probeName,
+        type: result.device.probe[0].probeType,
+        channel: result.device.probe[0].probeCh,
+        tempMin: result.device.probe[0].tempMin,
+        tempMax: result.device.probe[0].tempMax,
+        humiMin: result.device.probe[0].humMin,
+        humiMax: result.device.probe[0].humMax,
+        tempAdj: result.device.probe[0].adjustTemp,
+        humiAdj: result.device.probe[0].adjustHum,
+        firstDay: result.firstDay ?? "OFF",
+        secondDay: result.secondDay ?? "OFF",
+        thirdDay: result.thirdDay ?? "OFF",
+        firstTime: result.firstTime ?? "OFF",
+        secondTime: result.secondTime ?? "OFF",
+        thirdTime: result.thirdTime ?? "OFF",
+        doorQty: result.device.probe[0].door ?? 1,
+        position: result.device.probe[0].location,
+      }
+    });
     removeCache("device");
     removeCache("config");
     return result;
