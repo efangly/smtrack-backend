@@ -38,6 +38,7 @@ const regisUser = async (params: TRegisUser, pic?: Express.Multer.File): Promise
     sendToAuthQueue({ 
       id: result.userId, 
       username: result.userName, 
+      password: result.userPassword,
       display: result.displayName, 
       wardId: result.ward.wardId, 
       hosId: result.ward.hospital.hosId 
