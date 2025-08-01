@@ -1,6 +1,7 @@
 import amqp from 'amqplib';
-import { TNewConfig, TNewDevice, TNewProbe } from '../models';
+import { TNewConfig, TNewProbe } from '../models';
 import { prisma } from '../configs';
+import { removeCache } from '../utils';
 
 const RABBITMQ_URL = 'amqp://localhost';
 const QUEUE_NAME = 'legacy_queue';
@@ -96,6 +97,9 @@ const connectRabbitMQ = async () => {
             });
             break;
         }
+        removeCache("device");
+        removeCache("config");
+        removeCache("probe");
         channel.ack(msg); // ACK ถ้าสำเร็จ
       } catch (error) {
         console.error('Error handling message:', error);
