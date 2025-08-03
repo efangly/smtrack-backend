@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { prisma } from "../configs";
 import { checkCachedData, getDateFormat, objToString, removeCache, setCacheData } from "../utils";
 import { NotFoundError } from "../error";
-import { ResToken } from "../models";
+import { ResToken, TNewProbe } from "../models";
 import { addHistory } from "./history.service";
+import { sendToDeviceQueue } from "./queue.service";
 
 const probeList = async (token: ResToken): Promise<Probes[]> => {
   try {
@@ -79,14 +80,30 @@ const editProbe = async (probeId: string, body: Probes, token: ResToken) => {
   try {
     const detail = objToString(body);
     body.updateAt = getDateFormat(new Date());
-    const result = await prisma.probes.update({
+    const probe = await prisma.probes.update({
       where: { probeId: probeId },
       data: body
     });
-    await addHistory(`Probe: [${detail}]`, result.devSerial, token.userId);
+    await addHistory(`Probe: [${detail}]`, probe.devSerial, token.userId);
     await removeCache("probe");
     await removeCache("device");
-    return result;
+    await sendToDeviceQueue<{id: String, probe: TNewProbe}>('update-probe', {
+      id: probe.devSerial,
+      probe: {
+        name: probe.probeName,
+        type: probe.probeType,
+        channel: probe.probeCh,
+        tempMin: probe.tempMin,
+        tempMax: probe.tempMax,
+        humiMin: probe.humMin,
+        humiMax: probe.humMax,
+        tempAdj: probe.adjustTemp,
+        humiAdj: probe.adjustHum,
+        doorQty: probe.door ?? 1,
+        position: probe.location
+      }
+    });
+    return probe;
   } catch (error) {
     throw error;
   }

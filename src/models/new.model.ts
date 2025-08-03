@@ -68,12 +68,12 @@ export const ZNewProbe = z.object({
   notiToNormal: z.boolean().optional(), // ส่งแจ้งเตือนหลังอุณหภูมิกลับมาปกติ
   notiMobile: z.boolean().optional(), // เปิดปิดการแจ้งเตือน
   notiRepeat: z.number().optional(), // ตั้งค่าการส่งซ้ำ ค่าเริ่มต้นคือ 1
-  firstDay: z.string().default("OFF"),
-  secondDay: z.string().default("OFF"),
-  thirdDay: z.string().default("OFF"),
-  firstTime: z.string().default("0000"),
-  secondTime: z.string().default("0000"),
-  thirdTime: z.string().default("0000")
+  firstDay: z.string().optional(),
+  secondDay: z.string().optional(),
+  thirdDay: z.string().optional(),
+  firstTime: z.string().optional(),
+  secondTime: z.string().optional(),
+  thirdTime: z.string().optional()
 });
 
 export type TNewDevice = z.infer<typeof ZNewDevice>;
