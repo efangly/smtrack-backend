@@ -258,13 +258,13 @@ const editConfig = async (deviceId: string, body: Configs, token: ResToken): Pro
     sendToDeviceQueue<{id: String, config:TNewConfig}>('update-config', {
       id: result.devSerial,
       config: {
-        dhcp: result.mode === "1" ? true : false,
+        dhcp: result.mode === "1" ? false : true,
         ip: result.ip ?? undefined,
         mac: result.macAddWiFi ?? undefined,
         subnet: result.subNet ?? undefined,
         gateway: result.getway ?? undefined,
         dns: result.dns ?? undefined,
-        dhcpEth: result.modeEth === "1" ? true : false,
+        dhcpEth: result.modeEth === "1" ? false : true,
         ipEth: result.ipEth ?? undefined,
         macEth: result.macAddEth ?? undefined,
         subnetEth: result.subNetEth ?? undefined,
@@ -341,13 +341,13 @@ const editDeviceConfig = async (deviceId: string, body: TAdjustConfig): Promise<
     sendToDeviceQueue<{id: String, config:TNewConfig}>('update-config', {
       id: result.devSerial,
       config: {
-        dhcp: result.config?.mode === "1" ? true : false,
+        dhcp: result.config?.mode === "1" ? false : true,
         ip: result.config?.ip ?? undefined,
         mac: result.config?.macAddWiFi ?? undefined,
         subnet: result.config?.subNet ?? undefined,
         gateway: result.config?.getway ?? undefined,
         dns: result.config?.dns ?? undefined,
-        dhcpEth: result.config?.modeEth === "1" ? true : false,
+        dhcpEth: result.config?.modeEth === "1" ? false : true,
         ipEth: result.config?.ipEth ?? undefined,
         macEth: result.config?.macAddEth ?? undefined,
         subnetEth: result.config?.subNetEth ?? undefined,
