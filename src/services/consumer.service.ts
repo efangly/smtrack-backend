@@ -43,7 +43,7 @@ const connectRabbitMQ = async () => {
                       humMax: probeData.humiMax,
                       adjustTemp: probeData.tempAdj,
                       adjustHum: probeData.humiAdj,
-                      delayTime: probeData.stampTime,
+                      delayTime: probeData.stampTime || "5",
                       door: probeData.doorQty,
                       location: probeData.position,
                     }
