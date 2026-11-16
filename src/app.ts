@@ -2,7 +2,7 @@ import express,{ Application, NextFunction, Response, Request } from "express";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
-import { prisma, socket, initRedis } from "./configs";
+import { socket } from "./configs";
 import routes from "./routes";
 import { globalErrorHanlder } from "./middlewares";
 import { initQueue } from "./services";
@@ -35,7 +35,6 @@ app.use('/etemp', routes);
 app.use(globalErrorHanlder);
 
 app.listen(port, () => {
-  initRedis();
   initQueue();
   connectRabbitMQ().catch(console.error);
   socket.on('connect', () => console.log("Socket connected"));
