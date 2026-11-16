@@ -1,11 +1,7 @@
 import { Router } from "express";
-import { isAdmin, verifyToken } from "../middlewares";
-import { getConfig, getConfigById, updateConfig, updateDeviceConfig } from "../controllers";
+import { getConfigById } from "../controllers";
 const configRouter = Router();
 
-configRouter.get('/', getConfig);
 configRouter.get('/:devSerial', getConfigById);
-configRouter.put('/:devSerial', verifyToken, updateConfig);
-configRouter.patch('/:devSerial', updateDeviceConfig);
 
 export default configRouter;
