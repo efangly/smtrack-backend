@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-export const ZLogParam = z.object({ logId: z.string() });
-export const ZQueryLog = z.object({
-  devSerial: z.string(),
-  filter: z.string().optional(),
-  type: z.string().optional()
-});
-
 const ZLog = z.object({
   devSerial: z.string(),
   tempValue: z.number().optional(),
@@ -59,5 +52,3 @@ export const ZLogType = ZLog.or(ZLogArray);
 export type TLog = z.infer<typeof ZLogType>;
 export type TNewLog = z.infer<typeof ZNewLogType>;
 export type TNewNotification = z.infer<typeof ZNewNotificationType>;
-
-export type TQueryLog = z.infer<typeof ZQueryLog>;
